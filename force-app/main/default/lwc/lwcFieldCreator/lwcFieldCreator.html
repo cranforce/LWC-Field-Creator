@@ -1,0 +1,340 @@
+<template>
+    <lightning-card title="LWC Field Creator" icon-name="custom:custom31">
+        <template if:true={spinner}>
+            <lightning-spinner
+                variant="brand"
+                size="medium">
+            </lightning-spinner>
+        </template>
+        <lightning-button 
+            slot="actions"
+            variant="brand" 
+            label="Create Field" 
+            onclick={submitField}
+        ></lightning-button>
+
+        <div class="slds-grid">
+            <div class="slds-col slds-p-around_small slds-align_absolute-center">
+                <lightning-radio-group 
+                    name="topRadioGroup"
+                    options={topOptions}
+                    value={topType}
+                    onchange={handleTopSelection}
+                    type="button"
+                ></lightning-radio-group>
+            </div>
+            <div class="slds-col slds-p-bottom_small slds-p-horizontal_large">
+                <lightning-combobox
+                    label="Object"
+                    name="objectCombobox"
+                    value={objectValue}
+                    placeholder="Select..."
+                    options={objectOptions}
+                    onchange={handleObjectSelection}
+                    required
+                ></lightning-combobox>
+            </div>
+            <div class="slds-col slds-p-bottom_small slds-p-horizontal_large">
+                <lightning-combobox
+                    label="Field Type"
+                    name="fieldType"
+                    value={fieldType}
+                    placeholder="Select..."
+                    options={fieldTypeOptions}
+                    onchange={handleFieldTypeSelection}
+                    required
+                ></lightning-combobox>
+            </div>
+        </div>
+        <template if:true={renderGrid}>
+            <div class="slds-grid" style="max-height:700px;">
+                <div class="slds-col slds-size_3-of-12 slds-p-horizontal_small slds-border_right">
+                    <div class="slds-text-heading_medium">
+                        Field Metadata
+                    </div>
+                    <template if:true={renderFieldMap.fieldLabel}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Field Label" data-id="fieldLabel" name="fieldLabel" value={fieldLabel} type="text" onchange={handleFieldLabelChange} required></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldName}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Field Name" data-id="fieldName" name="fieldName" value={fieldName} type="text" disabled={fieldNameDisabled} onchange={handleFieldNameChange} required></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.overrideFieldName}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Override field name" data-id="overrideFieldName" name="overrideFieldName" value={overrideFieldName} type="checkbox" onchange={handleOverrideCheckbox}></lightning-input>
+                        </div>
+                    </template>
+                    
+                    <!--  -->
+                    <!--  -->
+                    <!--  -->
+                    <template if:true={renderFieldMap.picklistOptions}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-radio-group label="Values" data-id="picklistValueSelection" name="picklistValueSelection" value={picklistValueSelection} type="radio" options={picklistValueOptions} onchange={handlePicklistValueSelectionChange} required></lightning-radio-group>
+                        </div>
+                        
+                        <template if:true={picklistGlobalSelected}>
+                            <div class="slds-m-vertical_x-small">
+                                <lightning-combobox name="fieldGlobalPicklist" value={fieldGlobalPicklist} placeholder="Select..." options={fieldGlobalPicklistOptions} onchange={handleFieldGlobalPicklistChange} required></lightning-combobox>
+                            </div>
+                        </template>
+                        <template if:true={picklistLocalSelected}>
+                            <div class="slds-m-vertical_x-small">
+                                <div class="slds-m-vertical_x-small">
+                                    <lightning-textarea data-id="fieldLocalPicklist" name="fieldLocalPicklist" value={fieldLocalPicklist} onchange={handleFieldLocalPicklistChange} required></lightning-textarea>
+                                </div>
+                            </div>
+                            <div class="slds-m-vertical_x-small">
+                                <lightning-input 
+                                    label="Display values alphabetically, not in the order entered" 
+                                    data-id="fieldPicklistAlphabetical" 
+                                    name="fieldPicklistAlphabetical" 
+                                    value={fieldPicklistAlphabetical} 
+                                    type="checkbox" 
+                                    onchange={handleFieldPicklistAlphabeticalChange}
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-m-vertical_x-small">
+                                <lightning-input 
+                                    label="Use first value as default value" 
+                                    data-id="fieldPicklistFirstValueDefault" 
+                                    name="fieldPicklistFirstValueDefault" 
+                                    value={fieldPicklistFirstValueDefault} 
+                                    type="checkbox" 
+                                    onchange={handleFieldPicklistFirstValueDefaultChange}
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-m-vertical_x-small">
+                                <lightning-input 
+                                    label="Restrict picklist to the values defined in the value set" 
+                                    data-id="fieldPicklistRestricted" 
+                                    name="fieldPicklistRestricted" 
+                                    value={fieldPicklistRestricted} 
+                                    type="checkbox" 
+                                    onchange={handleFieldPicklistRestrictedChange}
+                                ></lightning-input>
+                            </div>
+                        </template>
+                    </template>
+                    <!--  -->
+                    <!--  -->
+                    <!--  -->
+
+                    <template if:true={renderFieldMap.fieldDisplayFormat}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Display Format" data-id="fieldDisplayFormat" name="fieldDisplayFormat" value={fieldDisplayFormat} type="text" onchange={handleFieldDisplayFormatChange} required></lightning-input>
+                        </div>
+                        <a onclick={openDisplayLinkWindow}>Display Format Explanation</a>
+                    </template>
+                    <template if:true={renderFieldMap.fieldStartingNumber}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Starting Number" data-id="fieldStartingNumber" name="fieldStartingNumber" value={fieldStartingNumber} type="number" onchange={handleFieldStartingNumberChange} required></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldLatLongDisplay}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-radio-group label="Latitude and Longitude Display Notion" data-id="fieldLatLongDisplay" name="fieldLatLongDisplay" value={fieldLatLongDisplay} type="radio" options={fieldLatLongDisplayOptions} required></lightning-radio-group>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldLength}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Length" data-id="fieldLength" name="fieldLength" value={fieldLength} type="number" onchange={handleFieldLengthChange} required></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldNumberLength}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Length" data-id="fieldNumberLength" name="fieldNumberLength" value={fieldNumberLength} type="number" onchange={handleFieldNumberLengthChange} required></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldDecimalPlaces}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Decimal Places" data-id="fieldDecimalPlaces" name="fieldDecimalPlaces" value={fieldDecimalPlaces} type="number" onchange={handleFieldDecimalPlacesChange} required></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldVisibleLines}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="# Visible Lines" data-id="fieldVisibleLines" name="fieldVisibleLines" value={fieldVisibleLines} type="number" onchange={handleFieldVisibleLinesChange} required></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldDescription}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-textarea label="Description" data-id="fieldDescription" name="fieldDescription" value={fieldDescription} onchange={handleFieldDescriptionChange} ></lightning-textarea>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldHelpText}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-textarea label="Help Text" data-id="fieldHelpText" name="fieldHelpText" value={fieldHelpText} onchange={handleFieldHelpTextChange} ></lightning-textarea>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldRequired}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Required" data-id="fieldRequired" name="fieldRequired" value={fieldRequired} type="checkbox" onchange={handleFieldRequiredChange}></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldUnique}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Unique" data-id="fieldUnique" name="fieldUnique" value={fieldUnique} type="checkbox" onchange={handleFieldUniqueChange}></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldCaseSensitivity}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-radio-group label="Case Sensitivity" data-id="fieldCaseSensitivity" name="fieldCaseSensitivity" value={fieldCaseSensitivity} type="radio" options={fieldCaseSensitivityOptions}></lightning-radio-group>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldExternalId}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="External ID" data-id="fieldExternalId" name="fieldExternalId" value={fieldExternalId} type="checkbox" onchange={handleFieldExternalIdChange}></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldAIPrediction}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="AI Prediction" data-id="fieldAIPrediction" name="fieldAIPrediction" value={fieldAIPrediction} type="checkbox" onchange={handleFieldAIPredictionChange}></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.maskTypeCombobox}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-combobox label="Mask Type" data-id="maskTypeCombobox" name="maskTypeCombobox" value={fieldMaskType} placeholder="Select..." options={fieldMaskTypeOptions} onchange={handleFieldMaskTypeSelection} required></lightning-combobox>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.maskCharacterCombobox}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-combobox label="Mask Character" data-id="maskCharacterCombobox" name="maskCharacterCombobox" value={fieldMaskCharacter} placeholder="Select..." options={fieldMaskCharacterOptions} onchange={handleFieldMaskCharacterSelection} required></lightning-combobox>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldDefaultValueToggle}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-input label="Default Value" data-id="fieldDefaultValueToggle" name="fieldDefaultValueToggle" value={fieldDefaultValueToggle} type="toggle" onchange={handleFieldDefaultValueToggleChange} message-toggle-active="Checked" message-toggle-inactive="Unchecked"></lightning-input>
+                        </div>
+                    </template>
+                    <template if:true={renderFieldMap.fieldDefaultValueText}>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-textarea label="Default Value" data-id="fieldDefaultValueText" name="fieldDefaultValueText" value={fieldDefaultValueText} onchange={handleFieldDefaultValueTextChange}></lightning-textarea>
+                        </div>
+                    </template>
+                </div>
+    
+                <template if:true={renderProfilePermsetVisibility}>
+                    <div class="slds-col slds-size_5-of-12 slds-p-horizontal_small slds-border_right">
+                        <div class="slds-text-heading_medium">
+                            Profile/permset visibility
+                        </div>
+                        <div class="slds-grid slds-m-vertical_x-small slds-p-bottom_small slds-border_bottom">
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning-input  
+                                    label="Show Profiles"
+                                    name="showProfiles" 
+                                    value={showProfiles} 
+                                    type="checkbox" 
+                                    onchange={handleShowProfiles}
+                                    checked
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning-input  
+                                    label="Show Permsets"
+                                    name="showPermissionSets" 
+                                    value={showPermissionSets} 
+                                    type="checkbox" 
+                                    onchange={handleShowPermissionSets}
+                                    checked
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                {totalReadAccessSelected} Read access selected
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                {totalEditAccessSelected} Edit access selected
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-m-vertical_x-small slds-p-bottom_xx-small slds-border_bottom">
+                            <div class="slds-col slds-size_1-of-6">
+                                Type
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                Name
+                            </div>
+                            <div class="slds-col slds-size_1-of-6">
+                                <lightning-input
+                                    label="Read"  
+                                    name="selectAllReadAccess" 
+                                    value={selectAllReadAccess}
+                                    type="checkbox" 
+                                    onchange={handleSelectAllReadAccess}
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-6">
+                                <lightning-input
+                                    label="Edit"  
+                                    name="selectAllEditAccess" 
+                                    value={selectAllEditAccess}
+                                    type="checkbox" 
+                                    onchange={handleSelectAllEditAccess}
+                                ></lightning-input>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-wrap slds-m-vertical_x-small slds-scrollable_y" style="max-height: 80%">
+                            <template for:each={profilesAndPermissionSets} for:item="currentItem" for:index="index">
+                                <template if:true={currentItem.Visible}>
+                                    <div key={currentItem.Id} class="slds-size_1-of-6">
+                                        {currentItem.Type}
+                                    </div>
+                                    <div key={currentItem.Id} class="slds-size_1-of-2">
+                                        {currentItem.Name}
+                                    </div>
+                                    <div key={currentItem.Id} class="slds-size_1-of-6">
+                                        <lightning-input  
+                                            name={currentItem.ArrayIndex}
+                                            value={currentItem.ReadChecked}
+                                            type="checkbox" 
+                                            onchange={handleReadAccessClicked}
+                                            checked={currentItem.ReadChecked}
+                                        ></lightning-input>
+                                    </div>
+                                    <div key={currentItem.Id} class="slds-size_1-of-6">
+                                        <lightning-input  
+                                            name={currentItem.ArrayIndex}
+                                            value={currentItem.EditChecked} 
+                                            type="checkbox"
+                                            onchange={handleEditAccessClicked}
+                                            checked={currentItem.EditChecked}
+                                        ></lightning-input>
+                                    </div>
+                                </template>    
+                            </template>
+                        </div>
+                    </div>
+                </template>
+                <template if:true={renderPageLayoutVisibility}>
+                    <div class="slds-col slds-size_4-of-12 slds-p-horizontal_small">
+                        <div class="slds-text-heading_medium">
+                            Add field to layouts
+                        </div>
+                        <div class="slds-text-heading_medium">
+                            In Development
+                        </div>
+                        <!-- <div class="slds-m-vertical_x-small slds-p-bottom_small slds-border_bottom">
+                            <lightning-input  
+                                label={selectAllLayoutsLabel}
+                                name="selectAllLayouts" 
+                                value={selectAllLayouts} 
+                                type="checkbox" 
+                                onchange={handleSelectAllLayouts}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-m-vertical_x-small">
+                            <lightning-checkbox-group 
+                                name="layoutGroup"
+                                options={layoutOptions}
+                                value={layoutValue}
+                                onchange={handleLayoutChange}
+                            ></lightning-checkbox-group>
+                        </div> -->
+                    </div>
+                </template>
+            </div>
+        </template>
+    </lightning-card>
+</template>
